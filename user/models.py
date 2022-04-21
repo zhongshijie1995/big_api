@@ -2,7 +2,7 @@ from typing import Optional
 
 from sqlalchemy import Column, String
 from pydantic import BaseModel
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, relationship
 
 from db import database
 

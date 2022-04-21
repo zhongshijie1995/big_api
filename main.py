@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 from user import routers as user_routers
+from vip import routers as vip_routers
 from db import database
 
 
@@ -17,6 +18,7 @@ app = FastAPI(
 )
 # 包括模块的路由
 app.include_router(user_routers.router, tags=['用户'])
+app.include_router(vip_routers.router, tags=['会员'])
 
 
 if __name__ == '__main__':
