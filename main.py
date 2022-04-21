@@ -11,6 +11,9 @@ app = FastAPI(
     title='API试验场',
     description='FastAPI实验大操场，集成一些实验过程',
     version='0.0.1',
+    redoc_url=None,
+    docs_url='/',
+    swagger_ui_parameters={'defaultModelsExpandDepth': -1, 'tryItOutEnabled': True},
 )
 # 包括模块的路由
 app.include_router(user_routers.router, tags=['用户'])

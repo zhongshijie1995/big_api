@@ -5,10 +5,8 @@ from db import config
 
 
 # 创建数据库连接引擎
-engine = create_engine(
-    config.SQLALCHEMY_DATABASE_URL,
-    connect_args={'check_same_thread': True if config.SQLALCHEMY_DATABASE_URL else False}
-)
+connect_args = {'check_same_thread': True if config.SQLALCHEMY_DATABASE_URL.startswith('sqlite') else False}
+engine = create_engine(config.SQLALCHEMY_DATABASE_URL, connect_args=connect_args)
 # 配置数据库连接会话
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 # 数据库ORM模型基类
