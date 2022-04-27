@@ -1,37 +1,37 @@
 from datetime import timedelta, datetime
 from typing import Optional
 
+from user.dao import user
+from user.config import secret, exception
+
 from fastapi import HTTPException
 from jose import jwt, JWTError
 
-from user import config
-from user import models
 
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """
-    验证密码（明文vs密文）
-    :param plain_password:
-    :param hashed_password:
-    :return:
-    """
-    return config.pwd_context.verify(plain_password, hashed_password)
-
-
-def authenticate_user(db, username: str, password: str) -> Optional[models.UserModel]:
+def authenticate_user(_db, username: str, password: str) -> Optional[user.UserModel]:
     """
     用户认证
-    :param db:
+    :param _db:
     :param username:
     :param password:
     :return:
     """
-    user = models.get_user(db, username)
-    if not user:
+    def verify_password(plain_password: str, hashed_password: str) -> bool:
+        """
+        验证密码（明文vs密文）
+        :param plain_password:
+        :param hashed_password:
+        :return:
+        """
+        return secret.pwd_context.verify(plain_password, hashed_password)
+
+    # 获取用户数据
+    _user = user.get_user(_db, username)
+    if not _user:
         return None
-    if not verify_password(password, user.password):
+    if not verify_password(password, _user.password):
         return None
-    return user
+    return _user
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
@@ -47,7 +47,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, config.SECRET_KEY, algorithm=config.ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, secret.SECRET_KEY, algorithm=secret.ALGORITHM)
     return encoded_jwt
 
 
@@ -57,7 +57,7 @@ def get_exception(msg: str) -> HTTPException:
     :param msg:
     :return:
     """
-    return HTTPException(config.exception_dict[msg], msg)
+    return HTTPException(exception.exception_dict[msg], msg)
 
 
 def get_access_token(username: str) -> str:
@@ -66,7 +66,7 @@ def get_access_token(username: str) -> str:
     :param username:
     :return:
     """
-    access_token_expires = timedelta(minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=secret.ACCESS_TOKEN_EXPIRE_MINUTES)
     return create_access_token(data={'sub': username}, expires_delta=access_token_expires)
 
 
@@ -77,6 +77,6 @@ def get_username_by_token(token: str) -> Optional[str]:
     :return:
     """
     try:
-        return jwt.decode(token, config.SECRET_KEY, algorithms=[config.ALGORITHM]).get('sub')
+        return jwt.decode(token, secret.SECRET_KEY, algorithms=[secret.ALGORITHM]).get('sub')
     except JWTError:
         return None

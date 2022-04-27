@@ -1,0 +1,8 @@
+fastapi
+jose
+passlib
+pydantic
+SQLAlchemy
+starlette
+uvicorn
+pymysql

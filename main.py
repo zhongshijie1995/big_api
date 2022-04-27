@@ -1,12 +1,12 @@
 from fastapi import FastAPI
 
 from user import routers as user_routers
-from vip import routers as vip_routers
-from db import database
+from comm import database
 
 
 # 初始化数据库
 database.init_db()
+
 # 初始化应用
 app = FastAPI(
     title='API试验场',
@@ -14,11 +14,13 @@ app = FastAPI(
     version='0.0.1',
     redoc_url=None,
     docs_url='/',
-    swagger_ui_parameters={'defaultModelsExpandDepth': -1, 'tryItOutEnabled': True},
+    swagger_ui_parameters={
+        'defaultModelsExpandDepth': -1,
+        'tryItOutEnabled': True
+    },
 )
 # 包括模块的路由
 app.include_router(user_routers.router, tags=['用户'])
-app.include_router(vip_routers.router, tags=['会员'])
 
 
 if __name__ == '__main__':
